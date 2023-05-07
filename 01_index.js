@@ -95,10 +95,55 @@
         res.render("signup");
     })
     
-    // login 페이지 들어왔을 때 > 000 보이게 하기 
+    // login 창구 | GET 요청 처리  
     app.get('/login' , (req, res) => {
         res.render("login");
     })
+
+    // login 창구 | POST 요청 처리 
+    app.post('/login' , (req, res) => {
+        
+        console.log(req.body)   
+            // [해석] 
+                // req 를 찍어보니까, body 안에, login 에서 input 으로 보낸 id 와 pw 가 들어가 있어. 그 이유는? 
+                    // 1) login 페이지에서 input 으로 전달된 값을 '미들웨어' 가 받음 
+                        // 여기 코드에서는 'app.use(express.urlencoded({extended : false}));' 라고 설정했음. 
+                    // 2) 미들웨어가 input 으로 부터 전달받은 데이터를 처리 함. ('파싱' 하는 과정)
+                    // 3) 그 결과, login 페이지의 input 태그의 값이 서버에서 req.body 로 볼 수 있게 됨.  
+
+        // 구조 분해 할당으로 id, pw 받기 
+            const {user_id, user_pw} = req.body;
+            console.log(user_id, user_pw)
+        
+        // user_id 와 user_pw 가 sql 안에 있는지 조회 
+        const sql = "SELECT * FROM users WHERE user_id = ? AND user_pw = ?";
+            // SELECT * FROM users | 'users 데이터테이블' 에서 '모든 데이터(행과열)'를 검색 한다. 
+            // WHERE | 특정 조건만 만든걸 select 해~ 라는 의미 
+            // [사전 조건]
+                // sql 과 연결이 되어 있어야 함 
+
+        _mysql.query(sql, [user_id , user_pw], (err, result) => {
+            if(err) {
+                // 로그인 실패
+                console.log(err)
+                console.log("로그인 실패")
+
+            } else {
+                // 로그인 성공
+                console.log(result)
+                console.log("로그인 성공")
+            }
+        })
+            // [해석]
+                // _mysql | mysql 에서 연결한 것을 담아둔 변수
+                // query 메소드 | 📛📛📛 이게 지금 이해가 안 돼 
+
+
+
+    })
+
+
+
 
     // list 페이지 들어왔을 때 > 000 보이게 하기 
     app.get('/list' , (req, res) => {
@@ -123,9 +168,11 @@
 
 
 
+
+
 // 🔷 서버 대기 상태 
     // 포트 지정
-        const PORT = 8090; 
+        const PORT = 8070; 
 
     // app.listen
         app.listen(PORT, () => {
